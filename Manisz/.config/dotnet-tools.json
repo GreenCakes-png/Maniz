@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "isRoot": true,
+  "tools": {
+    "neo.compiler.csharp": {
+      "version": "3.6.2-CI00519",
+      "commands": [
+        "nccs"
+      ]
+    }
+  }
+}
