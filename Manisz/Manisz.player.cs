@@ -14,7 +14,6 @@ namespace Neo.SmartContract.Template
         [DisplayName("PlayerJoinedLeague")]
         public static event OnPlayerJoinedLeagueDelegate OnPlayerJoinedLeague;
 
-
         private static readonly byte[] Prefix_Players = new byte[] { 0xa1 };
 
         private static byte[] GetPlayersLeagueKey(string partialKey, UInt160 user) => Prefix_Players.Concat(partialKey).Concat(user);
@@ -22,17 +21,19 @@ namespace Neo.SmartContract.Template
         public static void JoinLeague(string league)
         {
             ExecutionEngine.Assert(Runtime.CheckWitness(Runtime.Transaction.Sender), "??");
-            ExecutionEngine.Assert(Storage.Get(GetLeagueKey(league)) == null, "League does not exist");
+            ExecutionEngine.Assert(Storage.Get(GetLeagueKey(league)) != null, "League does not exist");
 
             Storage.Put(GetPlayersLeagueKey(league, Runtime.Transaction.Sender), 1);
             OnPlayerJoinedLeague(Runtime.Transaction.Sender, league);
+
+            //Call to reset user NEP17 tokens
         }
 
         [Safe]
         public static bool HasUserJoined(string league)
         {
             ExecutionEngine.Assert(Runtime.CheckWitness(Runtime.Transaction.Sender), "??");
-            ExecutionEngine.Assert(Storage.Get(GetLeagueKey(league)) == null, "League does not exist");
+            ExecutionEngine.Assert(Storage.Get(GetLeagueKey(league)) != null, "League does not exist");
 
             return (BigInteger)Storage.Get(GetPlayersLeagueKey(league, Runtime.Transaction.Sender)) == 1;
         }

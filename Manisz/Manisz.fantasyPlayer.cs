@@ -18,8 +18,14 @@ namespace Neo.SmartContract.Template
 
         private static byte[] GetFantasyPlayerKey(string partialKey) => Prefix_Player.Concat(partialKey);
 
+
+        //TODO: Update multiple players at once
+
         public static void UpdateFantasyPlayer(bool active)
         {
+            //If player is active
+            //Can not have more than 11 players active
+
             if(!Runtime.CheckWitness(Runtime.Transaction.Sender)) return;
 
             var player = Storage.Get(GetFantasyPlayerKey(Runtime.Transaction.Sender));

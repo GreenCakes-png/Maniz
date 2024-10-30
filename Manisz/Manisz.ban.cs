@@ -22,7 +22,7 @@ namespace Neo.SmartContract.Template
         private const byte Prefix_Ban_Counter = 0xee;
         private const byte Prefix_Fantasy_Player_League_Ban = 0xaa;
 
-        //Used to track bans
+        //Track bans
         [Safe]
         public static bool IsFantasyPlayerBanned(ByteString tokenId) =>
             (BigInteger)Storage.Get((new[] { Prefix_Fantasy_Player_League_Ban }).Concat(tokenId)) == 1;
@@ -31,7 +31,7 @@ namespace Neo.SmartContract.Template
             Storage.Put((new[] { Prefix_Fantasy_Player_League_Ban }).Concat(tokenId), 1);
 
 
-        //Used to track the number of banned fantasy players a user can do in a league
+        //Track banned fantasy player counter by user
         [Safe]
         public static BigInteger CurrentBanCountForPlayer(ByteString league) =>
             (BigInteger)Storage.Get((new[] { Prefix_Ban_Counter }).Concat(league).Concat(Runtime.Transaction.Sender));
@@ -43,7 +43,7 @@ namespace Neo.SmartContract.Template
             Storage.Put((new[] { Prefix_Ban_Counter }).Concat(league).Concat(Runtime.Transaction.Sender), count);
 
         
-        //Set ban counter for a league which a user can ban players 
+        //Ban counter for league
         public static void SetLeaguePlayerBanCount(BigInteger count, ByteString league)
         {
             ExecutionEngine.Assert(IsOwner(), "Only owner can do this");
