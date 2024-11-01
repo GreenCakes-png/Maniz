@@ -35,7 +35,8 @@ namespace Neo.SmartContract.Template
                 return;
             }
 
-            UpdateActiveCount(from, league, -1);
+            if(!UpdateActiveCount(from, league, -1)) return;
+
             Storage.Put(GetFantasyPlayerKey(tokenId,from), 0);
 
             OnFantasyPlayerStatus(tokenId, from, false);
@@ -50,7 +51,7 @@ namespace Neo.SmartContract.Template
             var player = (BigInteger)Storage.Get(GetFantasyPlayerKey(tokenId,from));
             if(player == 0 && !active) return;
 
-            UpdateActiveCount(from, league, active ? 1 : -1);
+            if(!UpdateActiveCount(from, league, active ? 1 : -1)) return;
             Storage.Put(GetFantasyPlayerKey(tokenId,from), active ? 1 : -1);
 
             OnFantasyPlayerStatus(tokenId, from, active);
