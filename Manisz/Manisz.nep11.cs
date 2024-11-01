@@ -45,7 +45,7 @@ namespace Neo.SmartContract.Template
             UpdatePlayerOwner(tokenId, from);
 
             //Move to the bench
-            UpdateFantasyPlayer(false);
+            MoveToTheBench(tokenId, from, "league from data");
             OnPlayerForSale(tokenId, amount, from);
         }
 
