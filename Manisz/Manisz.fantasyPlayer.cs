@@ -1,9 +1,6 @@
 using Neo.SmartContract.Framework;
 using Neo.SmartContract.Framework.Services;
-using Neo.SmartContract.Framework.Native;
 using System.ComponentModel;
-using System.Linq;
-using Neo.SmartContract.Framework.Attributes;
 using System.Numerics;
 
 namespace Neo.SmartContract.Template
@@ -45,7 +42,7 @@ namespace Neo.SmartContract.Template
         public static void UpdateFantasyPlayer(ByteString tokenId, UInt160 from, ByteString league, bool active)
         {
             ExecutionEngine.Assert(Runtime.CheckWitness(Runtime.Transaction.Sender), "?");
-            var owner = (UInt160)Contract.Call("Nep11Contract", "ownerOf", CallFlags.All, tokenId);
+            var owner = (UInt160)Contract.Call(GetMintContractAddress(), "ownerOf", CallFlags.All, tokenId);
             ExecutionEngine.Assert(owner.Equals(from), "Not your player");
 
             var player = (BigInteger)Storage.Get(GetFantasyPlayerKey(tokenId,from));

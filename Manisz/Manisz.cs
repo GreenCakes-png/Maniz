@@ -7,7 +7,7 @@ using System.ComponentModel;
 
 namespace Neo.SmartContract.Template
 {
-    [DisplayName(nameof(Manisz))]
+    [DisplayName(nameof(Manisz) + "2")]
     [ContractAuthor("<Your Name Or Company Here>", "<Your Public Email Here>")]
     [ContractDescription( "<Description Here>")]
     [ContractVersion("<Version String Here>")]

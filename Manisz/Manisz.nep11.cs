@@ -1,54 +1,50 @@
 using Neo.SmartContract.Framework;
 using Neo.SmartContract.Framework.Attributes;
+using Neo.SmartContract.Framework.Native;
 using Neo.SmartContract.Framework.Services;
 using System.ComponentModel;
-using System.Linq;
 using System.Numerics;
 
 namespace Neo.SmartContract.Template
 {
     public partial class Manisz : Neo.SmartContract.Framework.SmartContract
     {
-        public delegate void OnPlayerForSaleDelegate(ByteString TokenId, BigInteger Price, UInt160 from);
+        private static readonly byte[] Prefix_Mint_Contract_Address = new byte[] { 0x07 };
 
-        [DisplayName("Player for sale")]
-        public static event OnPlayerForSaleDelegate OnPlayerForSale;
-
-
-        private static readonly byte[] Prefix_Price_Of_Player_For_Sale = new byte[] { 0x05 };
-        private static readonly byte[] Prefix_Owner_Of_Player_For_Sale = new byte[] { 0x06 };
-
-        [Safe]
-        public static bool IsPlayerForSale(ByteString tokenId) 
-            => PriceOfPlayer(tokenId) > 0;
-        
-        [Safe]
-        public static BigInteger PriceOfPlayer(ByteString tokenId) 
-            => (BigInteger)Storage.Get(Prefix_Price_Of_Player_For_Sale.Concat(tokenId));
-
-        private static void UpdatePlayerPrice(ByteString tokenId, BigInteger amount) =>
-            Storage.Put(Prefix_Price_Of_Player_For_Sale.Concat(tokenId), amount);
-
-        private static void UpdatePlayerOwner(ByteString tokenId, UInt160 owner) =>
-            Storage.Put(Prefix_Owner_Of_Player_For_Sale.Concat(tokenId), owner);
-
-        public static void onNEP11Payment(UInt160 from, BigInteger amount, ByteString tokenId, object data)
+        public static void onNEP11Payment(UInt160 from, BigInteger amount, ByteString tokenId, object[] data)
         {
-            ExecutionEngine.Assert(amount > 0, "Must be greater than 0 ");
+            if(data == null) return;
 
-            //Check data for quick sale
-            
-            //Else continue
-            
-            //Owner & Price
-            UpdatePlayerPrice(tokenId, amount);
-            UpdatePlayerOwner(tokenId, from);
+            var operation = (string)data[0];
 
-            //Move to the bench
-            MoveToTheBench(tokenId, from, "league from data");
-            OnPlayerForSale(tokenId, amount, from);
+            if(operation == "Sell")
+            {
+                var price = (BigInteger)data[0];
+                var league = (string)data[1];
+                UpdatePlayerPrice(tokenId, price);
+                UpdatePlayerOwner(tokenId, from);
+                MoveToTheBench(tokenId, from, league);
+                OnPlayerForSale(tokenId, price, from);
+            }
+
+            if(operation == "QuickSell")
+            {
+                //Set default price ?
+                var league = (string)data[1];
+                UpdatePlayerPrice(tokenId, 100);
+                UpdatePlayerOwner(tokenId, Runtime.ExecutingScriptHash);
+                MoveToTheBench(tokenId, from, league);
+                OnPlayerForSale(tokenId, 100, Runtime.ExecutingScriptHash);
+            }
         }
 
-        //Cancel sale
+        public static void SetMintContractAddress(UInt160 hash)
+        {
+            ExecutionEngine.Assert(IsOwner(), "Only owner can do this");
+            Storage.Put(Prefix_Mint_Contract_Address, hash);
+        }
+
+        [Safe]
+        public static UInt160 GetMintContractAddress() => (UInt160)Storage.Get(Prefix_Mint_Contract_Address);
     }
 }
