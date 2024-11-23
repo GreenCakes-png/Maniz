@@ -21,20 +21,23 @@ namespace Neo.SmartContract.Template
             {
                 var price = (BigInteger)data[0];
                 var league = (string)data[1];
+                var team = (string)data[2];
+
                 UpdatePlayerPrice(tokenId, price);
                 UpdatePlayerOwner(tokenId, from);
-                MoveToTheBench(tokenId, from, league);
-                OnPlayerForSale(tokenId, price, from);
+                MoveToTheBench(tokenId, from, league, team);
+                OnPlayerForSale(tokenId, price, from, league, team);
             }
 
             if(operation == "QuickSell")
             {
                 //Set default price ?
                 var league = (string)data[1];
+                var team = (string)data[2];
                 UpdatePlayerPrice(tokenId, 100);
                 UpdatePlayerOwner(tokenId, Runtime.ExecutingScriptHash);
-                MoveToTheBench(tokenId, from, league);
-                OnPlayerForSale(tokenId, 100, Runtime.ExecutingScriptHash);
+                MoveToTheBench(tokenId, from, league, team);
+                OnPlayerForSale(tokenId, 100, Runtime.ExecutingScriptHash, league, team);
             }
         }
 

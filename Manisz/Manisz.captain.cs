@@ -7,7 +7,7 @@ namespace Neo.SmartContract.Template
 {
     public partial class Manisz : Neo.SmartContract.Framework.SmartContract
     {
-        public delegate void OnTeamCaptainsSelectedDelegate(UInt160 from, ByteString league, ByteString captain, ByteString CoCaptain);
+        public delegate void OnTeamCaptainsSelectedDelegate(UInt160 from, ByteString league, ByteString team, ByteString captain, ByteString CoCaptain);
 
         [DisplayName("TeamCaptainsSelected")]
         public static event OnTeamCaptainsSelectedDelegate OnTeamCaptainsSelected;
@@ -16,20 +16,20 @@ namespace Neo.SmartContract.Template
         private static readonly byte[] Prefix_Captain = new byte[] { 0x03 };
         private static readonly byte[] Prefix_CoCaptain = new byte[] { 0x04 };
 
-        public static void SetCaptains(ByteString league, ByteString Captain, ByteString CoCaptain)
+        public static void SetCaptains(ByteString league, ByteString team, ByteString Captain, ByteString CoCaptain)
         {
-            ExecutionEngine.Assert(Runtime.CheckWitness(Runtime.Transaction.Sender), "Only owner can do this");
+            ExecutionEngine.Assert(Runtime.CheckWitness(Runtime.Transaction.Sender), "??");
 
-            if(GetCaptain(Runtime.Transaction.Sender, league) == null)
-            {
-                SetCaptain(Runtime.Transaction.Sender, league, Captain);
-            }
+            var ownerOfCaptain = (UInt160)Contract.Call(GetMintContractAddress(), "ownerOf", CallFlags.All, Captain);
+            ExecutionEngine.Assert(ownerOfCaptain.Equals(Runtime.Transaction.Sender), "Not your player");
 
-            if(GetCoCaptain(Runtime.Transaction.Sender, league) == null)
-            {
-                SetCoCaptain(Runtime.Transaction.Sender, league, Captain);
-            }
+            var ownerOfCoCaptain = (UInt160)Contract.Call(GetMintContractAddress(), "ownerOf", CallFlags.All, CoCaptain);
+            ExecutionEngine.Assert(ownerOfCoCaptain.Equals(Runtime.Transaction.Sender), "Not your player");
 
+            SetCaptain(Runtime.Transaction.Sender, league, Captain);
+            SetCoCaptain(Runtime.Transaction.Sender, league, CoCaptain);
+
+            OnTeamCaptainsSelected(Runtime.Transaction.Sender, league, team, Captain, CoCaptain);
         }
 
         private static void SetCaptain(UInt160 from, ByteString league, ByteString tokenId) 

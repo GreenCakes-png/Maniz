@@ -8,21 +8,26 @@ namespace Neo.SmartContract.Template
 {
     public partial class Manisz : Neo.SmartContract.Framework.SmartContract
     {
-        public delegate void OnPlayerForSaleDelegate(ByteString TokenId, BigInteger Price, UInt160 from);
+        public delegate void OnPlayerForSaleDelegate(ByteString TokenId, BigInteger Price, UInt160 from, ByteString league, ByteString team);
 
         [DisplayName("PlayerForSale")]
         public static event OnPlayerForSaleDelegate OnPlayerForSale;
+
+        public delegate void OnPlayerSoldDelegate(ByteString TokenId, UInt160 to, ByteString league, ByteString team);
+
+        [DisplayName("PlayerSold")]
+        public static event OnPlayerSoldDelegate OnPlayerSold;
 
         private static readonly byte[] Prefix_Market = new byte[] { 0x01, 0x02 };
         private static byte[] GetMarketKey(string tokenId) => Prefix_Market.Concat(tokenId);
         private static readonly byte[] Prefix_Market_Player_Prev_Owner = new byte[] { 0x01, 0x03 };
         private static byte[] GetMarketPlayerPrevOwnerKey(string tokenId) => Prefix_Market_Player_Prev_Owner.Concat(tokenId);
 
-        private static void InitPlayer(ByteString tokenId, BigInteger amount)
+        private static void InitPlayer(ByteString tokenId, BigInteger amount, ByteString league, ByteString team)
         {
             UpdatePlayerPrice(tokenId, amount);
             UpdatePlayerOwner(tokenId, Runtime.ExecutingScriptHash);
-            OnPlayerForSale(tokenId, amount, Runtime.ExecutingScriptHash);
+            OnPlayerForSale(tokenId, amount, Runtime.ExecutingScriptHash, league, team);
         }
 
         [Safe]

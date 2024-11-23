@@ -39,6 +39,8 @@ namespace Neo.SmartContract.Template
             {
                 //Buy player
                 var tokenId = (string)data[1];
+                var team = (string)data[2];
+
                 ExecutionEngine.Assert(Runtime.CallingScriptHash == GetFantasyTokenScriptHash(), "Unknown token");
                 ExecutionEngine.Assert(IsPlayerForSale(tokenId), "Not for sale");
                 ExecutionEngine.Assert(PriceOfPlayer(tokenId) == amount, "Price error");
@@ -48,6 +50,7 @@ namespace Neo.SmartContract.Template
 
                 // Contract.Call(GetFantasyTokenScriptHash(), "transfer", CallFlags.All, from, amount, "GettingPaid");
                 Contract.Call(GetMintContractAddress(), "transfer", CallFlags.All, from, tokenId, null);
+                OnPlayerSold(tokenId, from, playerLeague, team);
             }
         }
     }
